@@ -10,7 +10,11 @@ data = [
      "due_date": datetime.now(),
      "created_at": datetime.now()
      },
- 
+    {"campaign_id": 2,
+     "name": "Black Friday",
+     "due_date": datetime.now(),
+     "created_at": datetime.now()
+     },
 
     
 ]
