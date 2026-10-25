@@ -36,6 +36,9 @@ def get_session():
 
 SessionDep = Annotated[Session, Depends(get_session)]
 
+@asynccontextmanager
+async
+
 @app.get("/")
 async def root():
     return {"message": "Hello world!"}
