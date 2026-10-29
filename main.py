@@ -94,9 +94,6 @@ async def update_campaign(campaign_id: int, campaign: CampaignCreate, session: S
 
 
 
-# @app.get("/campaigns")
-# async def read_campaigns():
-#     return {"campaigns": data}
 
 # @app.get("/campaign/{id}")
 # async def read_campaign(id: int):
