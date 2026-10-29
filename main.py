@@ -83,17 +83,17 @@ async def create_campaign(campaign: CampaignCreate ,session: SessionDep):
     session.refresh(db_campaign)
     return {"data":db_campaign}
     
-@app.post("/campaigins", response_model= Response[Campaign])
+@app.put("/campaigns", response_model= Response[Campaign])
 async def update_campaign(campaign_id: int, campaign: CampaignCreate, session: SessionDep):
     data = session.get(Campaign, id)
     if not data:
         raise HTTPException(status_code=404)
     data.name = campaign.name
     data.due_date = campaign.due_date
-
-
-
-
+    session.add(data)
+    session.commit()
+    session.refresh(data)
+    return {"data": data}
 
 # @app.get("/campaign/{id}")
 # async def read_campaign(id: int):
