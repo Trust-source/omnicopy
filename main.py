@@ -58,24 +58,24 @@ async def root():
     return {"message": "Hello world!"}
 
 
-class Response(BaseModel, Generic[T]):
+class ApiResponse(BaseModel, Generic[T]):
     data: T
 
 
-@app.get("/campaigns", response_model= Response[list[Campaign]])
+@app.get("/campaigns", response_model= ApiResponse[list[Campaign]])
 async def read_campaigns(session: SessionDep):
     data = session.exec(select(Campaign)).all()
-    return {"campaigns": data}
+    return {"data": data}
 
 
-@app.get("/campaigns/{id}", response_model= Response[Campaign])
+@app.get("/campaigns/{id}", response_model= ApiResponse[Campaign])
 async def read_campaign(id: int, session: SessionDep):
     data = session.get(Campaign, id)
     if not data:
         raise HTTPException(status_code= 404) 
-    return {"campaign": data}
+    return {"data": data}
 
-@app.post("/campaigns", status_code= 201, response_model = Response[Campaign])
+@app.post("/campaigns", status_code= 201, response_model = ApiResponse[Campaign])
 async def create_campaign(campaign: CampaignCreate ,session: SessionDep):
     db_campaign = Campaign.model_validate(campaign)
     session.add(db_campaign)
@@ -83,8 +83,8 @@ async def create_campaign(campaign: CampaignCreate ,session: SessionDep):
     session.refresh(db_campaign)
     return {"data":db_campaign}
     
-@app.put("/campaigns", response_model= Response[Campaign])
-async def update_campaign(campaign_id: int, campaign: CampaignCreate, session: SessionDep):
+@app.put("/campaigns", response_model= ApiResponse[Campaign])
+async def update_campaign(id: int, campaign: CampaignCreate, session: SessionDep):
     data = session.get(Campaign, id)
     if not data:
         raise HTTPException(status_code=404)
@@ -95,48 +95,14 @@ async def update_campaign(campaign_id: int, campaign: CampaignCreate, session: S
     session.refresh(data)
     return {"data": data}
 
-# @app.get("/campaign/{id}")
-# async def read_campaign(id: int):
-#     for campaign in data:
-#         if campaign.get("campaign_id") == id:
-#             return campaign
-#     raise HTTPException(status_code = 404)
 
-# @app.post("/campaigns", status_code = 201)
-# async def create_campaign(body: dict):
-#     if not body.get("name"):
-#         raise HTTPException(status_code = 403, detail = "Forbidden: Name is required..")
-#     new = {
-#         "campaign_id": randint(100, 1000),
-#         "name": body.get("name"),
-#         "due_date": body.get("due_date"),
-#         "created_at": utcnow()
-#     }
-
-#     data.append(new)
-#     return {"campaign": new}
+@app.delete("/campaign/{id}", status_code= 204)
+async def delete_campaign(id:int, session: SessionDep):
+    data = session.get(Campaign, id)
+    if not data:
+        raise HTTPException(status_code= 404)
+    session.delete(data)
+    session.commit()
+ 
 
 
-# @app.put("/campaigns")
-# async def update_campaign(id: int, body: dict):
-#     for index, campaign in enumerate(data):
-#         if campaign.get("campaign_id") == id:
-#             updated = {
-#                 "campaign_id": id,
-#                 "name": body.get("name"),
-#                 "due_date": body.get("due_date"),
-#                 "created_at": campaign.get("created_at")
-#             }
-
-#             data[index] = updated
-#             return {"campaign": updated}
-#     raise HTTPException(status_code = 404)
-
-
-# @app.delete("/campaigns/id")
-# def delete_campaign(id: int):
-#     for index, campaign in enumerate(data):
-#         if campaign.get("campaign_id") == id:
-#             data.pop(index)
-#             return Response(status_code = 204)
-#     raise HTTPException(status_code = 404)
